@@ -24,12 +24,17 @@
           var currentClass = classes.find((c) =>
             moment().isBetween(c.start, c.end)
           );
+          var nextClass = classes.find((c) => moment().isBefore(c.start));
           setCountdown(
             currentClass
               ? html`<div>${currentClass.name}</div>
                   <div>ends in</div>
                   <div>${currentClass.end.fromNow(true)}</div>`
-              : html`<div>Ingen lektion!</div>`
+              : nextClass
+              ? html`<div>${nextClass.name}</div>
+                  <div>starts in</div>
+                  <div>${nextClass.start.fromNow(true)}</div>`
+              : html`<div>Freedom!</div>`
           );
         }, 1000);
         return () => clearInterval(timer);
