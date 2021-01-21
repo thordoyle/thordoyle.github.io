@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>När slutar vi?</title>
+  <script type="module">
+    import htm from "https://unpkg.com/htm@latest?module";
+    import { h, render } from "https://unpkg.com/preact@latest?module";
+    import {
+      useState,
+      useEffect,
+    } from "https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module";
+    import moment from "https://unpkg.com/moment@latest?module";
+    import jsonSchema from "./schema.js";
+    const html = htm.bind(h);
+    const App = () => {
+      const [countdown, setCountdown] = useState(null);
+      useEffect(() => {
+        const today = jsonSchema.days[moment().day()];
+        const classes = today.classes.map((c) => ({
+          name: c.name,
+          start: moment(c.start, "hh:mm"),
+          end: moment(c.end, "hh:mm"),
+        }));
+        let timer = setInterval(() => {
+          var currentClass = classes.find((c) =>
+            moment().isBetween(c.start, c.end)
+          );
+          setCountdown(
+            currentClass
+              ? html`<div>${currentClass.name}</div>
+                  <div>ends in</div>
+                  <div>${currentClass.end.fromNow(true)}</div>`
+              : html`<div>Ingen lektion!</div>`
+          );
+        }, 1000);
+        return () => clearInterval(timer);
+      }, []);
+      return countdown;
+    };
+    render(html`<${App} />`, document.body);
+  </script>
+  <style type="text/css">
+    @import url("https://fonts.googleapis.com/css?family=Bowlby+One+SC");
+    body {
+      text-align: center;
+      font-family: "Bowlby One SC", cursive;
+      font-size: 10vw;
+    }
+  </style>
+</html>
+
+<!--
+  npm install -g node-static
+-->
